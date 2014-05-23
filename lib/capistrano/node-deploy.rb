@@ -44,6 +44,7 @@ Capistrano::Configuration.instance(:must_exist).load do |configuration|
 
   set :stdout_log_path, lambda { "#{shared_path}/log/#{node_env}.out.log" }
   set :stderr_log_path, lambda { "#{shared_path}/log/#{node_env}.err.log" }
+  set :log_path, lambda { "#{shared_path}/log/#{node_env}.log" }
 
   set :upstart_job_name, lambda { "#{application}-#{node_env}" } unless defined? upstart_job_name
   set :upstart_file_path, lambda { "/etc/init/#{upstart_job_name}.conf" } unless defined? upstart_file_path
@@ -61,7 +62,7 @@ respawn limit 99 5
 kill timeout #{kill_timeout}
 
 script
-    cd #{current_path} && exec sudo -u #{node_user} NODE_ENV=#{node_env} #{app_environment} #{node_binary} #{current_path}/#{app_command} 2>> #{stderr_log_path} 1>> #{stdout_log_path}
+    cd #{current_path} && exec sudo -u #{node_user} NODE_ENV=#{node_env} #{app_environment} #{node_binary} #{current_path}/#{app_command} >> #{log_path} 2>&1
 end script
 EOD
   }
